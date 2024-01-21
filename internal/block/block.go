@@ -46,3 +46,19 @@ func (b *BlockInterface) GenerateBlock(oldBlock Block, BPM int) (Block, error) {
 
 	return newBlock, nil
 }
+
+func (b *BlockInterface) IsValidBlock(newBlock, oldBlock Block) bool {
+	if newBlock.Index != oldBlock.Index+1 {
+		return false
+	}
+
+	if oldBlock.Hash != newBlock.PrevHash {
+		return false
+	}
+
+	if b.calculateHash(newBlock) != newBlock.Hash {
+		return false
+	}
+
+	return true
+}
