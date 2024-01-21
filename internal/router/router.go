@@ -24,7 +24,7 @@ func makeMuxRouter() http.Handler {
 	return muxRouter
 }
 
-func run() error {
+func Run() error {
 	mux := makeMuxRouter()
 	httpPort := os.Getenv("PORT")
 	log.Println("Listening on ", httpPort)
