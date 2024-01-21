@@ -1,11 +1,14 @@
 package router
 
 import (
+	"encoding/json"
+	"io"
 	"log"
 	"net/http"
 	"os"
 	"time"
 
+	Block "github.com/JaquesBoeno/BlockChain/internal/block"
 	"github.com/gorilla/mux"
 )
 
@@ -32,4 +35,18 @@ func run() error {
 		return err
 	}
 	return nil
+}
+
+func handleGetBlockchain(w http.ResponseWriter, r *http.Request) {
+	bytes, err := json.MarshalIndent(Block.BlockChain, "", " ")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	io.WriteString(w, string(bytes))
+}
+
+func handleWriteBlock() {
+
 }
