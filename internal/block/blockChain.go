@@ -2,7 +2,7 @@ package Block
 
 var BlockChain []Block
 
-func replaceChain(newBlocks []Block) {
+func ReplaceChain(newBlocks []Block) {
 	if len(newBlocks) > len(BlockChain) {
 		BlockChain = newBlocks
 	}

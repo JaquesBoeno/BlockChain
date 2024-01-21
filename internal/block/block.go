@@ -8,9 +8,6 @@ import (
 	"time"
 )
 
-type BlockInterface struct {
-}
-
 type Block struct {
 	Index     int
 	Timestamp string
@@ -19,7 +16,7 @@ type Block struct {
 	PrevHash  string
 }
 
-func (b *BlockInterface) calculateHash(block Block) string {
+func calculateHash(block Block) string {
 	record := strings.Builder{}
 	record.WriteString(fmt.Sprint(block.Index))
 	record.WriteString(block.Timestamp)
@@ -34,7 +31,7 @@ func (b *BlockInterface) calculateHash(block Block) string {
 	return hex.EncodeToString(hashed)
 }
 
-func (b *BlockInterface) GenerateBlock(oldBlock Block, BPM int) (Block, error) {
+func GenerateBlock(oldBlock Block, BPM int) (Block, error) {
 	var newBlock Block
 
 	t := time.Now()
@@ -42,12 +39,12 @@ func (b *BlockInterface) GenerateBlock(oldBlock Block, BPM int) (Block, error) {
 	newBlock.Index = oldBlock.Index + 1
 	newBlock.Timestamp = t.String()
 	newBlock.BPM = BPM
-	newBlock.PrevHash = b.calculateHash(newBlock)
+	newBlock.PrevHash = calculateHash(newBlock)
 
 	return newBlock, nil
 }
 
-func (b *BlockInterface) IsValidBlock(newBlock, oldBlock Block) bool {
+func IsValidBlock(newBlock, oldBlock Block) bool {
 	if newBlock.Index != oldBlock.Index+1 {
 		return false
 	}
@@ -56,7 +53,7 @@ func (b *BlockInterface) IsValidBlock(newBlock, oldBlock Block) bool {
 		return false
 	}
 
-	if b.calculateHash(newBlock) != newBlock.Hash {
+	if calculateHash(newBlock) != newBlock.Hash {
 		return false
 	}
 

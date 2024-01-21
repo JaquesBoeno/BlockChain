@@ -9,8 +9,13 @@ import (
 	"time"
 
 	Block "github.com/JaquesBoeno/BlockChain/internal/block"
+	"github.com/davecgh/go-spew/spew"
 	"github.com/gorilla/mux"
 )
+
+type Message struct {
+	BPM int
+}
 
 func makeMuxRouter() http.Handler {
 	muxRouter := mux.NewRouter()
@@ -47,6 +52,40 @@ func handleGetBlockchain(w http.ResponseWriter, r *http.Request) {
 	io.WriteString(w, string(bytes))
 }
 
-func handleWriteBlock() {
+func handleWriteBlock(w http.ResponseWriter, r *http.Request) {
+	var m Message
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(&m); err != nil {
+		respondWithJSON(w, r, http.StatusBadRequest, r.Body)
+		return
+	}
 
+	defer r.Body.Close()
+
+	newBlock, err := Block.GenerateBlock(Block.BlockChain[len(Block.BlockChain)-1], m.BPM)
+
+	if err != nil {
+		respondWithJSON(w, r, http.StatusInternalServerError, m)
+		return
+	}
+
+	if Block.IsValidBlock(newBlock, Block.BlockChain[len(Block.BlockChain)-1]) {
+		newBlockChain := append(Block.BlockChain, newBlock)
+		Block.ReplaceChain(newBlockChain)
+		spew.Dump(Block.BlockChain)
+	}
+
+	respondWithJSON(w, r, http.StatusCreated, newBlock)
+}
+
+func respondWithJSON(w http.ResponseWriter, r *http.Request, code int, payload interface{}) {
+	response, err := json.MarshalIndent(payload, "", "")
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		w.Write([]byte("HTTP 500: Internal Server Error"))
+		return
+	}
+
+	w.WriteHeader(code)
+	w.Write(response)
 }
